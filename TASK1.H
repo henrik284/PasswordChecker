@@ -24,12 +24,9 @@ using namespace std;
 
 /**
  * \namespace TASK1
- * \brief Contains the implementation
- * of check sum calculation.
+ * \brief Contains the implementation of check sum calculation.
  */
 namespace TASK1{
-
-
 
 /**
  * \var const string SYMBOLS
@@ -63,9 +60,9 @@ class BlackBoxUnsafe : public IBlackBox{
 public:
     /**
     * \brief Constructor:
-            Tests if the symbSetSize is valid (>0) and not bigger than the available number of symbols. If not, the default amount of characters is used.
-            Copies the wanted amount of symbols out of the default symbols string into a new symbols string created on the heap and pointed to by charSymbArray.
-            Calls the randomPwd methods and saves this password in the pwd_ member.
+             Tests if the symbSetSize is valid (>0) and not bigger than the available number of symbols. If not, the default amount of characters is used.
+             Copies the wanted amount of symbols out of the default symbols string into a new symbols string created on the heap and pointed to by charSymbArray.
+             Calls the randomPwd methods and saves this password in the pwd_ member.
     * \param pwdLength Length of the password, which will be created with the randomPwd method and saved in the pwd_ member.
     * \param symbSetSize Amount of available characters for the password.
     */
@@ -111,16 +108,23 @@ protected:
  * \brief Implements a more safe password checker where only the
  *        password's checksum is stored.
  */
-
-
-
 class BlackBoxSafe : public BlackBoxUnsafe{
 	/// \todo  Implementation of class BlackBoxSafe needs to be finalized.
 public:
-	BlackBoxSafe(int pwdLength, int symbSetSize) : BlackBoxUnsafe(pwdLength, symbSetSize){
-        pwd_ = sha256(pwd_);
-	};
-	virtual string input(string strPwd){return string("undefined");};
+	/**
+	*  \brief Constructor of BalckBoxSafe Class. Calls the BlackBoxUnsafe Constructor and directly overwrites the plan text password stored in the pwd_ member
+	*         by the BalckBoxUnsafe Constructor with the Checksum calculated by the sha256 algorithm.
+	*  \param pwdLength Length of the password, which will be created by the random pwd method and stored as Checksum in the pwd_ member
+	*  \param symbSetSize Amount of available characters for the password
+	*/
+	BlackBoxSafe(int pwdLength, int symbSetSize);
+
+	/**
+	*  \brief Compares the password checksum, which is given as argument, with the one saved in the member pwd_.
+    *  \param strPwd Password, which should be tested.
+    *  \return Returns a string containing "ACCESS ACCEPTED" if password is correct or "ACCESS DENIED" if not.
+    */
+	virtual string input(string strPwd);
 };
 
 

@@ -51,7 +51,20 @@ string BlackBoxUnsafe::randomPwd(int l){
 	return pwd_;
 }
 
+BlackBoxSafe::BlackBoxSafe(int pwdLength, int symbSetSize) : BlackBoxUnsafe(pwdLength, symbSetSize){
+    //Store the Checksum calculated by the sha256 algorithm in the pwd_ member
+    cout << "Output of the created pwd in plan text for program test: " << pwd_ << endl;
+    pwd_ = sha256(pwd_);
+    return;
+}
 
+string BlackBoxSafe::input(string strPwd){
+    if(strPwd.compare(pwd_) == 0){
+        return string("ACCESS ACCEPTED");
+    } else {
+        return string("ACCESS DENIED");
+    }
+}
 
 
 void demoTASK1_00(){

@@ -10,11 +10,45 @@
 #include <unistd.h> //contains various constants
 
 #include "SIMPLESOCKET.H"
+#include "SHA256.H"
 
 using namespace std;
 
 int main() {
 	srand(time(NULL));
+	TCPclient c;
+	string host = "localhost";
+	string msg;
+
+	//connect to host
+	c.conn(host , 2022);
+
+    while(1){
+        cout << "Please enter Password: " << endl;
+        string pwdInput;
+        cin >> pwdInput;
+
+        //Send the Checksum of the Password to the Server
+        pwdInput = sha256(pwdInput);
+        cout << "Client sends: " << pwdInput << endl;
+        c.sendData(pwdInput);
+
+        //Receive the answer of the Server
+        msg = c.receive(32);
+        cout << "Client got response: " << msg << endl;
+
+        //If password is correct, close server and client
+        if(msg=="ACCESS ACCEPTED"){
+        cout << "Password hacked. Closing Client and Server." << endl;
+        c.sendData(string("BYEBYE"));
+        return 0;
+        }
+    }
+}
+
+/* Original Main
+
+srand(time(NULL));
 	TCPclient c;
 	string host = "localhost";
 	string msg;
@@ -38,6 +72,7 @@ int main() {
 		sleep(1);
 
 	}
-}
+
+*/
 
 

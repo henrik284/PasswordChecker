@@ -52,9 +52,6 @@
 			<Option compilerVar="CC" />
 			<Option target="all" />
 		</Unit>
-		<Unit filename="TASK1.H">
-			<Option target="all" />
-		</Unit>
 		<Unit filename="client.C">
 			<Option compilerVar="CC" />
 			<Option target="all" />
@@ -67,6 +64,7 @@
 			<Option compilerVar="CC" />
 			<Option target="all" />
 		</Unit>
+		<Unit filename="server.H" />
 		<Extensions>
 			<code_completion />
 			<debugger />

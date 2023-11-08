@@ -17,19 +17,16 @@
 #include <netinet/in.h> //contains constants and structures needed for internet domain addresses
 
 #include "SIMPLESOCKET.H"
+#include "server.H"
 
 
-class myServer: public TCPserver{
- public:
-    myServer(int port, int msgSize) : TCPserver(port,msgSize){;};
- protected:
-    string myResponse(string input){
-        return string("my response");
-    }
-};
 
 int main(){
 	srand(time(nullptr));
-	myServer srv(2022,25);
+	pwdChecker srv(2022,64);
 	srv.run();
+}
+
+string pwdChecker::myResponse(string input){
+    return ptrPwdBox_->input(input);
 }
