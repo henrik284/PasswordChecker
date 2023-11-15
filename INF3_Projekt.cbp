@@ -52,6 +52,7 @@
 			<Option compilerVar="CC" />
 			<Option target="all" />
 		</Unit>
+		<Unit filename="TASK1.H" />
 		<Unit filename="client.C">
 			<Option compilerVar="CC" />
 			<Option target="all" />
