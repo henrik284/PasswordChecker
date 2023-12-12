@@ -23,10 +23,10 @@
 
 int main(){
 	srand(time(nullptr));
-	pwdChecker srv(2022,64);
+	pwdCheckerServer srv(2022,64);
 	srv.run();
 }
 
-string pwdChecker::myResponse(string input){
+string pwdCheckerServer::myResponse(string input){
     return ptrPwdBox_->input(input);
 }

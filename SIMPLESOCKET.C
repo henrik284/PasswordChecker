@@ -86,7 +86,7 @@ bool TCPclient::conn(string address , int port){
 	//Connect to remote server
 	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0){
 		perror("connect failed. Error");
-		return 1;
+		return false;                                                           //CHANGED TO RETURN FALSE
 	}
 
 	cout<<"Connected\n";

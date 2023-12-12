@@ -44,6 +44,8 @@ const unsigned int MINIMAL_PWD_LENGTH = 4;
  * \class IBlackBox
  *	\brief Interface class for password check classes.
  */
+
+
 class IBlackBox{
 public:
 	virtual string input(string strPwd) = 0;
