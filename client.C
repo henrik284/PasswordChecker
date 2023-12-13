@@ -55,6 +55,11 @@ int main(){
     cin >> maxCharAmount;
     cout << endl;
 
+    //maxCharAmount should not be bigger actual number of available characters, which are stored in the TASK1::SYMBOLS
+    if(maxCharAmount>TASK1::SYMBOLS.size()){
+        maxCharAmount = TASK1::SYMBOLS.size();
+    }
+
     //Create Stream to .csv file
     ofstream resultsStream("Results/Results.csv");
     if(!resultsStream){
