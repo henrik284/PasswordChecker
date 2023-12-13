@@ -16,8 +16,8 @@
 
 
 #define PORT 2022
-#define MAX_PWD_LENGHT 3
-#define MAX_CHAR_COUNT 3
+#define MAX_PWD_LENGHT 10
+#define MAX_CHAR_COUNT 10
 #define MESSAGE_SIZE 64
 
 using namespace std;
@@ -50,6 +50,9 @@ int main(){
     }
 
     cout << "Connected to the Server" << endl << endl;
+
+    //Create .csvFile
+
 
     //Loop over every Number of available characters
     for(int charsAvailable = 1; charsAvailable <= MAX_CHAR_COUNT; charsAvailable++){
@@ -94,10 +97,11 @@ int main(){
 
             cout << "Counter of Trials: " << counterOfTrials << "\tFinally hacked? " << passwordHacked << endl << endl;
 
+            //Save pwdLength, charsAvailable & CounterOfTrials in .csv file
 
         }
     }
-
+    return 0;
 }
 
 void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked){
@@ -125,7 +129,7 @@ void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int&
 
                 //Simulation of Server answer.
                 pwdMsg recmsg;
-                int coincidence = rand()%10;
+                int coincidence = rand()%25;
                 if(coincidence == 1){
                     recmsg.readMsg("Access(Allowed)");
                     cout << "correct password: " << password << endl;
@@ -141,6 +145,27 @@ void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int&
             }
         }
     }
+    return;
+}
+
+pwdMsg::pwdMsg(){
+    id_ = "";
+    arg1_ = "";
+    arg2_ = "";
+    arg3_ = "";
+    arg4_ = "";
+    return;
+}
+
+pwdMsg::pwdMsg(string recMsg){
+    id_ = "";
+    arg1_ = "";
+    arg2_ = "";
+    arg3_ = "";
+    arg4_ = "";
+
+    readMsg(recMsg);
+
     return;
 }
 
@@ -188,27 +213,6 @@ void pwdMsg::readMsg(string recMsg){
     return;
 }
 
-pwdMsg::pwdMsg(string recMsg){
-    id_ = "";
-    arg1_ = "";
-    arg2_ = "";
-    arg3_ = "";
-    arg4_ = "";
-
-    readMsg(recMsg);
-
-    return;
-}
-
-pwdMsg::pwdMsg(){
-    id_ = "";
-    arg1_ = "";
-    arg2_ = "";
-    arg3_ = "";
-    arg4_ = "";
-    return;
-}
-
 string pwdMsg::newMsg(string id, string arg1, string arg2, string arg3, string arg4){
     string newMessage = {};
     newMessage += id;
@@ -234,139 +238,3 @@ string pwdMsg::newMsg(string id, string arg1, string arg2, string arg3, string a
 
     return newMessage;
 }
-
-string writeMessage(string id, string arg1, string arg2, string arg3, string arg4){
-    string newMessage = {};
-    newMessage += id;
-    newMessage += "(";
-    newMessage += arg1;
-    if(arg2 != ""){
-        newMessage += ";";
-        newMessage += arg2;
-        if(arg3 != ""){
-            newMessage += ";";
-            newMessage += arg3;
-            if(arg4 != ""){
-                newMessage += ";";
-                newMessage += arg4;
-            }
-        }
-    }
-    newMessage += ")";
-
-    if(newMessage.size()>MESSAGE_SIZE){
-        return string("ERROR_(Message to long)");
-    }
-
-return newMessage;
-}
-
-
-
-msgStruct readMessage(string message){
-    msgStruct msgstruct;
-    if((message.find("(") == string::npos) || (message.find(")") == string::npos)){
-        msgstruct.id = "ERROR_";
-        msgstruct.arg1 = "Message does not contain ( and )";
-        return msgstruct;
-    }
-    int found = message.find("(");
-    msgstruct.id = message.substr(0,found);
-    message.erase(0,found+1);
-
-    found = message.find(";");
-    if(found==string::npos){
-        msgstruct.arg1 = message.substr(0, message.size()-1);
-        return msgstruct;
-    } else {
-        msgstruct.arg1 = message.substr(0,found);
-        message.erase(0,found+1);
-    }
-
-    found = message.find(";");
-    if(found==string::npos){
-        msgstruct.arg2 = message.substr(0, message.size()-1);
-        return msgstruct;
-    } else{
-        msgstruct.arg2 = message.substr(0, found);
-        message.erase(0,found+1);
-    }
-
-    found = message.find(";");
-    if(found==string::npos){
-        msgstruct.arg3 = message.substr(0, message.size()-1);
-    } else{
-        msgstruct.arg3 = message.substr(0, found);
-        msgstruct.arg4 = message.substr(found+1, message.size()-found-1-1);
-    }
-    return msgstruct;
-}
-
-
-
-
-/* First Demonstration
-int main() {
-	srand(time(NULL));
-	TCPclient c;
-	string host = "localhost";
-	string msg;
-
-	//connect to host
-	c.conn(host , 2022);
-
-    while(1){
-        cout << "Please enter Password: " << endl;
-        string pwdInput;
-        cin >> pwdInput;
-
-        //Send the Checksum of the Password to the Server
-        pwdInput = sha256(pwdInput);
-        cout << "Client sends: " << pwdInput << endl;
-        c.sendData(pwdInput);
-
-        //Receive the answer of the Server
-        msg = c.receive(32);
-        cout << "Client got response: " << msg << endl;
-
-        //If password is correct, close server and client
-        if(msg=="ACCESS ACCEPTED"){
-        cout << "Password hacked. Closing Client and Server." << endl;
-        c.sendData(string("BYEBYE"));
-        return 0;
-        }
-    }
-}
-
-*/
-
-/* Original Main
-
-srand(time(NULL));
-	TCPclient c;
-	string host = "localhost";
-	string msg;
-
-	//connect to host
-	c.conn(host , 2022);
-
-	int i=0;
-	bool goOn=1;
-	while(goOn){ // send and receive data
-		if((rand() % 20) < i++){
-			msg = string("BYEBYE");
-			goOn = 0;
-		}else{
-			msg = string("client wants this");
-		}
-		cout << "client sends:" << msg << endl;
-		c.sendData(msg);
-		msg = c.receive(32);
-		cout << "got response:" << msg << endl;
-		sleep(1);
-
-	}
-
-*/
-
-
