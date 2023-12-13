@@ -5,17 +5,17 @@
  *      Author: aml
  */
 
-
 /**
  * \file TASK1.H
  * \brief Contains namespace TASK1. Namespace TASK1 contains the implementation
  * of check sum calculation.
  */
 
-
-
 #ifndef TASK1_H_
 #define TASK1_H_
+
+#define MESSAGE_SIZE 64
+#define PORT 2022
 
 #include <string>
 #include "SHA256.H"
@@ -44,6 +44,8 @@ const unsigned int MINIMAL_PWD_LENGTH = 4;
  * \class IBlackBox
  *	\brief Interface class for password check classes.
  */
+
+
 class IBlackBox{
 public:
 	virtual string input(string strPwd) = 0;
@@ -145,6 +147,42 @@ void demoTASK1_01();
 void demoTASK1_02();
 
 } // end namespace TASK1
+
+/**
+*   \class pwdMsg
+*   \brief pwdMsg class stores information of an message with an string id an zero to four string arguments
+*/
+class pwdMsg {
+public:
+    /**
+    *   \brief constructor without an incoming message. Message can be read later with the readMsg method.
+    */
+    pwdMsg();
+
+    /**
+    *   \brief constructor with an incoming message. Message is stored in the members.
+    *   \param recMsg Received message
+    */
+    pwdMsg(string recMsg);
+
+    /**
+    *   \brief Stores the id and the arguments in the members
+    *   \param recMsg Received message
+    */
+    void readMsg(string recMsg);
+
+    /**
+    *   \brief Creates a Message out of the id and zero to four arguments.
+    *           Static function: can be called without an object.
+    */
+    static string newMsg(string id, string arg1 = "", string arg2 = "", string arg3 = "", string arg4 = "");
+
+    string id_ = "";
+    string arg1_ = "";
+    string arg2_ = "";
+    string arg3_ = "";
+    string arg4_ = "";
+};
 
 
 #endif /* TASK1_H_ */

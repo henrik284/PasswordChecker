@@ -14,10 +14,7 @@
 
 namespace TASK1{
 
-
-string BlackBoxUnsafe::getSymbols(){
-	return string(charSymbArray_);
-};
+//BlackboxUNSAFE
 
 BlackBoxUnsafe::BlackBoxUnsafe(int pwdLength, int symbSetSize){
 	if((symbSetSize < 1) || (symbSetSize > SYMBOLS.length()) ){
@@ -32,6 +29,10 @@ BlackBoxUnsafe::BlackBoxUnsafe(int pwdLength, int symbSetSize){
 	pwd_ = this->randomPwd(pwdLength);
 	return;
 }
+
+string BlackBoxUnsafe::getSymbols(){
+	return string(charSymbArray_);
+};
 
 string BlackBoxUnsafe::input(string strPwd){
 	if(strPwd.compare(pwd_) == 0){
@@ -51,21 +52,24 @@ string BlackBoxUnsafe::randomPwd(int l){
 	return pwd_;
 }
 
+
+//BlackboxSAFE
+
 BlackBoxSafe::BlackBoxSafe(int pwdLength, int symbSetSize) : BlackBoxUnsafe(pwdLength, symbSetSize){
-    //Store the Checksum calculated by the sha256 algorithm in the pwd_ member
-    cout << "Output of the created pwd in plan text for program test: " << pwd_ << endl;
-    pwd_ = sha256(pwd_);
+    pwd_ = sha256(pwd_);                                            //Store the Checksum calculated by the sha256 algorithm in the pwd_ member
     return;
 }
 
 string BlackBoxSafe::input(string strPwd){
-    if(strPwd.compare(pwd_) == 0){
+    if(strPwd.compare(sha256(pwd_)) == 0){
         return string("ACCESS ACCEPTED");
     } else {
         return string("ACCESS DENIED");
     }
 }
 
+
+//Demonstrations
 
 void demoTASK1_00(){
 	string pwd("meinpassword");

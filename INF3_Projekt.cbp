@@ -57,6 +57,7 @@
 			<Option compilerVar="CC" />
 			<Option target="all" />
 		</Unit>
+		<Unit filename="client.H" />
 		<Unit filename="main.C">
 			<Option compilerVar="CC" />
 			<Option target="all" />

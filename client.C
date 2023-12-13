@@ -9,70 +9,245 @@
 #include <iostream>
 #include <unistd.h> //contains various constants
 
-#include "SIMPLESOCKET.H"
-#include "SHA256.H"
+#include "client.H"
+#include <string>
+#include "TASK1.H"
+#include <fstream>
 
 using namespace std;
 
-int main() {
-	srand(time(NULL));
-	TCPclient c;
-	string host = "localhost";
-	string msg;
 
-	//connect to host
-	c.conn(host , 2022);
+int main(){
+    srand(time(NULL));
 
+    pwdCheckerClient client;
+    string host = "localhost";
+    string msg = {};
+
+    //Connect with Server
+    int connectionTrys = 0;
     while(1){
-        cout << "Please enter Password: " << endl;
-        string pwdInput;
-        cin >> pwdInput;
+        if(client.conn(host,PORT)==true){
+            break;
+        } else{
 
-        //Send the Checksum of the Password to the Server
-        pwdInput = sha256(pwdInput);
-        cout << "Client sends: " << pwdInput << endl;
-        c.sendData(pwdInput);
+        //Has to be removed when server is implemented
+        break;
 
-        //Receive the answer of the Server
-        msg = c.receive(32);
-        cout << "Client got response: " << msg << endl;
-
-        //If password is correct, close server and client
-        if(msg=="ACCESS ACCEPTED"){
-        cout << "Password hacked. Closing Client and Server." << endl;
-        c.sendData(string("BYEBYE"));
-        return 0;
+            if(connectionTrys<10){
+                sleep(1);
+                connectionTrys++;
+            } else {
+                cout << "Connection Failed. Closing Client" << endl;
+                return 0;
+            }
         }
     }
+    cout << "Connected to the Server" << endl;
+
+    //maxPwdLength & maxCharAmount abfragen
+    int maxPwdLength;
+    cout << "Please enter the maximum length of the password: ";
+    cin >> maxPwdLength;
+
+    int maxCharAmount;
+    cout << "Please enter the maximum amount of available characters for the password: ";
+    cin >> maxCharAmount;
+    cout << endl;
+
+    //Create Stream to .csv file
+    ofstream resultsStream("Results/Results.csv");
+    if(!resultsStream){
+        cout << "Output file could not be created" << endl;
+    }
+    resultsStream << "password length; available characters; trys" << endl;
+
+    //Loop over every Number of available characters
+    for(int charsAvailable = 1; charsAvailable <= maxCharAmount; charsAvailable++){
+
+        //Loop over all lenghts of passwords
+        for(int pwdLenght = 1; pwdLenght <= maxPwdLength; pwdLenght++){
+
+            //Loop over max 10 trys, in which the client trys to request a new password. Server has to answer with "ServerStatus(Password created)" to continue.
+            for(int i = 0; i < 10; i++){
+
+                //Send "Create-New-Password"-Command to the Server
+                //client.sendData(pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)));
+                            cout << "Sent message to server:\t" << pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)) << endl;
+
+
+                //Wait for the server to confirm, that a new password was created
+                //pwdMsg recmsg(client.receive(MESSAGE_SIZE);
+                            pwdMsg recmsg("ServerStatus(Password Created)");
+                            cout << "Simulated Answer:\tServerStatus(Password Created)" << endl << endl;
+
+                //If Sever has created the password, end this loop.
+                if((recmsg.id_ == "ServerStatus") && (recmsg.arg1_ == "Password Created")){
+                    break;
+                //If not, try again after 1 second, if it isn't already the 10th try. Then stop programm
+                } else if (i == 9){
+                    cout << "Server can not create the password. Client stopped." << endl;
+                    return 0;
+                }
+                sleep(1);
+            }
+
+            //Create the initial Password
+            string password(pwdLenght, TASK1::SYMBOLS.at(0));
+
+            //Variable to store the number of trys until the password is hacked.
+            int counterOfTrials = 0;
+
+            //Variable which is set to true if the password is hacked.
+            bool passwordHacked = false;
+
+            //Creating all possible Password with a recusive call of the createPwdRec function.
+            client.createPwdRec(password, pwdLenght-1, charsAvailable, counterOfTrials, passwordHacked);
+
+            cout << endl << "Counter of Trials: " << counterOfTrials << "\tFinally hacked? " << passwordHacked << endl << endl << endl;
+
+            //Save pwdLength, charsAvailable & CounterOfTrials in .csv file
+            resultsStream << pwdLenght << ";" << charsAvailable << ";" << counterOfTrials << ";" << endl;
+
+        }
+    }
+    resultsStream.close();
+    return 0;
 }
 
-/* Original Main
+void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked){
+    //Loop for replace the character on the current index with every available character
+    for(int i = 0; i < chars; i++){
+        password.at(index) = TASK1::SYMBOLS.at(i);
 
-srand(time(NULL));
-	TCPclient c;
-	string host = "localhost";
-	string msg;
+        if(index != 0){
+            //If the current index is not the first index (0) of the password, call this function again and manipulate the character on the index one lower
+            pwdCheckerClient::createPwdRec(password, index-1, chars, counterOfTrials, passwordHacked);
 
-	//connect to host
-	c.conn(host , 2022);
+            //If the password was hacked in the function call before, end the recusive function calls of guessing the password.
+            if(passwordHacked==true){
+                return;
+            }
+        } else{
+            //If the current index is the first index, the current password is one of the passwords which should be sended to the server. Increase the counter of Trial with 1.
+            counterOfTrials++;
 
-	int i=0;
-	bool goOn=1;
-	while(goOn){ // send and receive data
-		if((rand() % 20) < i++){
-			msg = string("BYEBYE");
-			goOn = 0;
-		}else{
-			msg = string("client wants this");
-		}
-		cout << "client sends:" << msg << endl;
-		c.sendData(msg);
-		msg = c.receive(32);
-		cout << "got response:" << msg << endl;
-		sleep(1);
+            //client.sendData(pwdMsg::newMsg("CheckPassword", password));
+                        cout << "Sent message to server:\t" << pwdMsg::newMsg("CheckPassword", password) << endl;
 
-	}
+            //Receive an answer of the server.
+            //pwdMsg recmsg(client.receive(MESSAGE_SIZE));
 
-*/
+                        //Simulation of Server answer.
+                        pwdMsg recmsg;
+                        int coincidence = rand()%25;
+                        if(coincidence == 1){
+                            cout << "Simulated Answer:\tAccess(Allowed)" << endl;
+                            recmsg.readMsg("Access(Allowed)");
+                            cout << "correct password: " << password << endl;
+                        } else{
+                            recmsg.readMsg("Access(Denied)");
+                            cout << "Simulated Answer:\tAccess(Denied)" << endl;
+                        }
 
+            if((recmsg.id_ == "Access") && (recmsg.arg1_ == "Allowed")){
+                //Set passwordHacked to true to stop previous recursive calls
+                passwordHacked = true;
+                //exit this Loop
+                break;
+            }
+        }
+    }
+    return;
+}
 
+pwdMsg::pwdMsg(){
+    id_ = "";
+    arg1_ = "";
+    arg2_ = "";
+    arg3_ = "";
+    arg4_ = "";
+    return;
+}
+
+pwdMsg::pwdMsg(string recMsg){
+    id_ = "";
+    arg1_ = "";
+    arg2_ = "";
+    arg3_ = "";
+    arg4_ = "";
+
+    readMsg(recMsg);
+
+    return;
+}
+
+void pwdMsg::readMsg(string recMsg){
+    //Check if received message has valid format.
+    if((recMsg.find("(") == string::npos) || (recMsg.find(")") == string::npos)){
+        id_ = "ERROR_";
+        arg1_ = "Message does not contain \"(\" and \")\"";
+        return;
+    }
+
+    //Save the id
+    int found = recMsg.find("(");
+    id_ = recMsg.substr(0,found);
+    recMsg.erase(0,found+1);
+
+    //Save argument 1
+    found = recMsg.find(";");
+    if(found == string::npos){          //If message has no or only one argument
+        arg1_ = recMsg.substr(0, recMsg.size()-1);
+        return;
+    } else {                            //If message has more than on argument (seperated by ;)
+        arg1_ = recMsg.substr(0,found);
+        recMsg.erase(0,found+1);
+    }
+
+    //Save argument 2
+    found = recMsg.find(";");
+    if(found==string::npos){            //If message had only two arguments
+        arg2_ = recMsg.substr(0, recMsg.size()-1);
+        return;
+    } else{                             //If message had more than two arguments
+        arg2_ = recMsg.substr(0, found);
+        recMsg.erase(0,found+1);
+    }
+
+    //Save argument 3 and 4
+    found = recMsg.find(";");
+    if(found==string::npos){            //If message had three arguments
+        arg3_ = recMsg.substr(0, recMsg.size()-1);
+    } else{                             //If message had four arguments
+        arg3_ = recMsg.substr(0, found);
+        arg4_ = recMsg.substr(found+1, recMsg.size()-found-1-1);
+    }
+    return;
+}
+
+string pwdMsg::newMsg(string id, string arg1, string arg2, string arg3, string arg4){
+    string newMessage = {};
+    newMessage += id;
+    newMessage += "(";
+    newMessage += arg1;
+    if(arg2 != ""){
+        newMessage += ";";
+        newMessage += arg2;
+        if(arg3 != ""){
+            newMessage += ";";
+            newMessage += arg3;
+            if(arg4 != ""){
+                newMessage += ";";
+                newMessage += arg4;
+            }
+        }
+    }
+    newMessage += ")";
+
+    if(newMessage.size()>MESSAGE_SIZE){
+        return string("ERROR_(Message to long)");
+    }
+
+    return newMessage;
+}
