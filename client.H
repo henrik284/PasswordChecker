@@ -22,7 +22,10 @@ public:
     /**
     *   \brief recursive fuction to generate all different passwords with the given password length and available characters.
     *   \param *password Pointer to the Password.
-    *   \param Chars number of available characters for the Password
+    *   \param index. Index of the character wich is manipulated in this function call
+    *   \param chars. Number of available chars
+    *   \param counterOfTrials. reference to a variable wich counts the Trials of guessing the Password.
+    *   \param passwordHacked. reference to a variable wich will be set to true if the password is guess. This stopps the password guessing process.
     */
     void createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked);
 

@@ -31,7 +31,7 @@ int main(){
             break;
         } else{
 
-        //Has to be removed when server is implemented
+        //"break" has to be removed when server is implemented
         break;
 
             if(connectionTrys<10){
@@ -106,7 +106,7 @@ int main(){
             //Variable which is set to true if the password is hacked.
             bool passwordHacked = false;
 
-            //Creating all possible Password with a recusive call of the createPwdRec function.
+            //Creating all possible Password with a call of the recursive createPwdRec function.
             client.createPwdRec(password, pwdLenght-1, charsAvailable, counterOfTrials, passwordHacked);
 
             cout << endl << "Counter of Trials: " << counterOfTrials << "\tFinally hacked? " << passwordHacked << endl << endl << endl;
@@ -115,6 +115,11 @@ int main(){
             resultsStream << pwdLenght << ";" << charsAvailable << ";" << counterOfTrials << ";" << endl;
 
         }
+    }
+    if(!resultsStream){
+        cout << "Results could not be saved in the Results.csv file. Check if the directory of this program has a \"Results\" folder" << endl;
+    } else {
+        cout << "The Results of this analysis have been saved in the Results.csv file in the Results folder." << endl;
     }
     resultsStream.close();
     return 0;
@@ -138,7 +143,7 @@ void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int&
             counterOfTrials++;
 
             //client.sendData(pwdMsg::newMsg("CheckPassword", password));
-                        cout << "Sent message to server:\t" << pwdMsg::newMsg("CheckPassword", password) << endl;
+                        cout << "Sent message to server:\t" << pwdMsg::newMsg("CheckPassword", password) << endl << endl;
 
             //Receive an answer of the server.
             //pwdMsg recmsg(client.receive(MESSAGE_SIZE));

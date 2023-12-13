@@ -150,23 +150,24 @@ void demoTASK1_02();
 
 /**
 *   \class pwdMsg
-*   \brief pwdMsg class stores information of an message with an string id an zero to four string arguments
+*   \brief pwdMsg class stores information of an message with an string id an zero to four string arguments.
+*           It also provides methods to create a message out of an id and some aguments and a method to read the id and the arguments out of the message and store them in the member variables.
 */
 class pwdMsg {
 public:
     /**
-    *   \brief constructor without an incoming message. Message can be read later with the readMsg method.
+    *   \brief constructor. Creates an object of this class and initializes the id and arguments with empty strings.
     */
     pwdMsg();
 
     /**
-    *   \brief constructor with an incoming message. Message is stored in the members.
+    *   \brief constructor. Creates an object and fills it with the information of an incoming message. The id and the arguments of the incoming message are getting stored in the members.
     *   \param recMsg Received message
     */
     pwdMsg(string recMsg);
 
     /**
-    *   \brief Stores the id and the arguments in the members
+    *   \brief Stores the id and the arguments in the members of an existing object
     *   \param recMsg Received message
     */
     void readMsg(string recMsg);
