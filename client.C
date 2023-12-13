@@ -13,11 +13,12 @@
 #include <string>
 #include <vector>
 #include "TASK1.H"
+#include <fstream>
 
 
 #define PORT 2022
-#define MAX_PWD_LENGHT 10
-#define MAX_CHAR_COUNT 10
+#define MAX_PWD_LENGHT 6
+#define MAX_CHAR_COUNT 6
 #define MESSAGE_SIZE 64
 
 using namespace std;
@@ -52,7 +53,11 @@ int main(){
     cout << "Connected to the Server" << endl << endl;
 
     //Create .csvFile
-
+    ofstream resultsStream("Results/Results.csv");
+    if(!resultsStream){
+        cout << "Output file could not be created" << endl;
+    }
+    resultsStream << "password length; available characters; trys" << endl;
 
     //Loop over every Number of available characters
     for(int charsAvailable = 1; charsAvailable <= MAX_CHAR_COUNT; charsAvailable++){
@@ -98,9 +103,11 @@ int main(){
             cout << "Counter of Trials: " << counterOfTrials << "\tFinally hacked? " << passwordHacked << endl << endl;
 
             //Save pwdLength, charsAvailable & CounterOfTrials in .csv file
+            resultsStream << pwdLenght << ";" << charsAvailable << ";" << counterOfTrials << ";" << endl;
 
         }
     }
+    resultsStream.close();
     return 0;
 }
 
