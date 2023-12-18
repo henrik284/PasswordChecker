@@ -25,7 +25,7 @@
 #include "server.H"
 #include "client.H"
 #include "TASK1.H"
-//#include "client.C"
+
 
 
 
@@ -49,8 +49,10 @@ string pwdCheckerServer::myResponse(string input){
     istringstream(message.arg4_) >> arg[3];
 
     if (message.id_ == "NewPassword"){
-
-        TASK1::BlackBoxSafe* ptrPwdBox_ = new TASK1::BlackBoxSafe(arg[0], arg[1]);
+        if (ptrPwdBox_ != NULL){
+            delete ptrPwdBox_;
+        }
+        ptrPwdBox_ = new TASK1::BlackBoxSafe(arg[0], arg[1]);
         return "ServerStatus(Password Created)";
     }
     else if (message.id_ == "CheckPassword"){
@@ -58,11 +60,10 @@ string pwdCheckerServer::myResponse(string input){
         int comp = message.arg1_.compare(ptrPwdBox_->pwd_);
 
         if(comp == 0){
-            return "Allowed";
-            delete ptrPwdBox_;
+            return "Access(Allowed)";
         }
         else{
-            return "Denied";
+            return "Access(Denied)";
         }
 
     }

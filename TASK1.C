@@ -102,4 +102,93 @@ void demoTASK1_02(){
 
 }
 
+pwdMsg::pwdMsg(){
+    id_ = "";
+    arg1_ = "";
+    arg2_ = "";
+    arg3_ = "";
+    arg4_ = "";
+    return;
+}
 
+pwdMsg::pwdMsg(string recMsg){
+    id_ = "";
+    arg1_ = "";
+    arg2_ = "";
+    arg3_ = "";
+    arg4_ = "";
+
+    readMsg(recMsg);
+
+    return;
+}
+
+void pwdMsg::readMsg(string recMsg){
+    //Check if received message has valid format.
+    if((recMsg.find("(") == string::npos) || (recMsg.find(")") == string::npos)){
+        id_ = "ERROR_";
+        arg1_ = "Message does not contain \"(\" and \")\"";
+        return;
+    }
+
+    //Save the id
+    int found = recMsg.find("(");
+    id_ = recMsg.substr(0,found);
+    recMsg.erase(0,found+1);
+
+    //Save argument 1
+    found = recMsg.find(";");
+    if(found == string::npos){          //If message has no or only one argument
+        arg1_ = recMsg.substr(0, recMsg.size()-1);
+        return;
+    } else {                            //If message has more than on argument (seperated by ;)
+        arg1_ = recMsg.substr(0,found);
+        recMsg.erase(0,found+1);
+    }
+
+    //Save argument 2
+    found = recMsg.find(";");
+    if(found==string::npos){            //If message had only two arguments
+        arg2_ = recMsg.substr(0, recMsg.size()-1);
+        return;
+    } else{                             //If message had more than two arguments
+        arg2_ = recMsg.substr(0, found);
+        recMsg.erase(0,found+1);
+    }
+
+    //Save argument 3 and 4
+    found = recMsg.find(";");
+    if(found==string::npos){            //If message had three arguments
+        arg3_ = recMsg.substr(0, recMsg.size()-1);
+    } else{                             //If message had four arguments
+        arg3_ = recMsg.substr(0, found);
+        arg4_ = recMsg.substr(found+1, recMsg.size()-found-1-1);
+    }
+    return;
+}
+
+string pwdMsg::newMsg(string id, string arg1, string arg2, string arg3, string arg4){
+    string newMessage = {};
+    newMessage += id;
+    newMessage += "(";
+    newMessage += arg1;
+    if(arg2 != ""){
+        newMessage += ";";
+        newMessage += arg2;
+        if(arg3 != ""){
+            newMessage += ";";
+            newMessage += arg3;
+            if(arg4 != ""){
+                newMessage += ";";
+                newMessage += arg4;
+            }
+        }
+    }
+    newMessage += ")";
+
+    if(newMessage.size()>MESSAGE_SIZE){
+        return string("ERROR_(Message to long)");
+    }
+
+    return newMessage;
+}
