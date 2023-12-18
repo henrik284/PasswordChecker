@@ -9,6 +9,10 @@
 #include <cstring> // contains string functions
 #include <cerrno> //It defines macros for reporting and retrieving error conditions through error codes
 #include <ctime> //contains various functions for manipulating date and time
+#include <string>
+#include <sstream>
+#include <iostream>
+
 
 #include <unistd.h> //contains various constants
 #include <sys/types.h> //contains a number of basic derived types that should be used whenever appropriate
@@ -16,10 +20,16 @@
 #include <sys/socket.h> // for socket creation
 #include <netinet/in.h> //contains constants and structures needed for internet domain addresses
 
+
 #include "SIMPLESOCKET.H"
 #include "server.H"
+#include "client.H"
+#include "TASK1.H"
+//#include "client.C"
 
 
+
+using namespace std;
 
 int main(){
 	srand(time(nullptr));
@@ -28,5 +38,37 @@ int main(){
 }
 
 string pwdCheckerServer::myResponse(string input){
-    return ptrPwdBox_->input(input);
+    pwdMsg message; //erstellt Objekt der Klasse pwdMsg mit leeren Strings
+    message.readMsg(input); //Nachricht vom Server wird in id_ und arg_ aufgeteilt
+
+    int arg[4];
+    //Umwandlung der Argumente von string zu int
+    istringstream(message.arg1_) >> arg[0];
+    istringstream(message.arg2_) >> arg[1];
+    istringstream(message.arg3_) >> arg[2];
+    istringstream(message.arg4_) >> arg[3];
+
+    if (message.id_ == "NewPassword"){
+
+        TASK1::BlackBoxSafe* ptrPwdBox_ = new TASK1::BlackBoxSafe(arg[0], arg[1]);
+        return "ServerStatus(Password Created)";
+    }
+    else if (message.id_ == "CheckPassword"){
+        message.arg1_ = sha256(message.arg1_);
+        int comp = message.arg1_.compare(ptrPwdBox_->pwd_);
+
+        if(comp == 0){
+            return "Allowed";
+            delete ptrPwdBox_;
+        }
+        else{
+            return "Denied";
+        }
+
+    }
+    else {
+        cout << "ERROR: invalid message from client";
+    }
+
+
 }
