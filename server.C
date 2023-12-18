@@ -33,7 +33,7 @@ using namespace std;
 
 int main(){
 	srand(time(nullptr));
-	pwdCheckerServer srv(2022,64);
+	pwdCheckerServer srv(PORT,MESSAGE_SIZE);
 	srv.run();
 }
 
@@ -56,8 +56,13 @@ string pwdCheckerServer::myResponse(string input){
         return "ServerStatus(Password Created)";
     }
     else if (message.id_ == "CheckPassword"){
+        cout << "message arg1: " << message.arg1_ << endl;
+
         message.arg1_ = sha256(message.arg1_);
         int comp = message.arg1_.compare(ptrPwdBox_->pwd_);
+
+        cout << "PwdBox_: " << ptrPwdBox_->pwd_ << endl;
+        cout << "message: " << message.arg1_ << endl;
 
         if(comp == 0){
             return "Access(Allowed)";
@@ -67,9 +72,4 @@ string pwdCheckerServer::myResponse(string input){
         }
 
     }
-    else {
-        cout << "ERROR: invalid message from client";
-    }
-
-
 }

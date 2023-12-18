@@ -56,6 +56,7 @@ string BlackBoxUnsafe::randomPwd(int l){
 //BlackboxSAFE
 
 BlackBoxSafe::BlackBoxSafe(int pwdLength, int symbSetSize) : BlackBoxUnsafe(pwdLength, symbSetSize){
+    cout << "Pwd in blackboxsafe: " << pwd_ << endl;
     pwd_ = sha256(pwd_);                                            //Store the Checksum calculated by the sha256 algorithm in the pwd_ member
     return;
 }

@@ -31,9 +31,6 @@ int main(){
             break;
         } else{
 
-        //"break" has to be removed when server is implemented
-        break;
-
             if(connectionTrys<10){
                 sleep(1);
                 connectionTrys++;
@@ -64,7 +61,11 @@ int main(){
     ofstream resultsStream("Results/Results.csv");
     if(!resultsStream){
         cout << "Output file could not be created" << endl;
+    } else{
+        cout << "Output file created" << endl;
     }
+    sleep(2);
+
     resultsStream << "password length; available characters; trys" << endl;
 
     //Loop over every Number of available characters
@@ -77,14 +78,16 @@ int main(){
             for(int i = 0; i < 10; i++){
 
                 //Send "Create-New-Password"-Command to the Server
-                //client.sendData(pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)));
-                            cout << "Sent message to server:\t" << pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)) << endl;
+                client.sendData(pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)));
+
+                cout << "Sent message to server:\t" << pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)) << endl;
 
 
                 //Wait for the server to confirm, that a new password was created
-                //pwdMsg recmsg(client.receive(MESSAGE_SIZE);
-                            pwdMsg recmsg("ServerStatus(Password Created)");
-                            cout << "Simulated Answer:\tServerStatus(Password Created)" << endl << endl;
+                pwdMsg recmsg(client.receive(MESSAGE_SIZE));
+
+                //pwdMsg recmsg("ServerStatus(Password Created)");
+                cout << "Answer from Server:\t" << recmsg.newMsg(recmsg.id_, recmsg.arg1_, recmsg.arg2_, recmsg.arg3_, recmsg.arg4_) << endl << endl;
 
                 //If Sever has created the password, end this loop.
                 if((recmsg.id_ == "ServerStatus") && (recmsg.arg1_ == "Password Created")){
@@ -107,7 +110,7 @@ int main(){
             bool passwordHacked = false;
 
             //Creating all possible Password with a call of the recursive createPwdRec function.
-            client.createPwdRec(password, pwdLenght-1, charsAvailable, counterOfTrials, passwordHacked);
+            client.createPwdRec(password, pwdLenght-1, charsAvailable, counterOfTrials, passwordHacked, &client);
 
             cout << endl << "Counter of Trials: " << counterOfTrials << "\tFinally hacked? " << passwordHacked << endl << endl << endl;
 
@@ -122,17 +125,21 @@ int main(){
         cout << "The Results of this analysis have been saved in the Results.csv file in the Results folder." << endl;
     }
     resultsStream.close();
+
+    //close the server
+    client.sendData("BYEBYE");
+
     return 0;
 }
 
-void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked){
-    //Loop for replace the character on the current index with every available character
+void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked, pwdCheckerClient* ptrClient){
+    //Loop for replacing the character on the current index with every available character
     for(int i = 0; i < chars; i++){
         password.at(index) = TASK1::SYMBOLS.at(i);
 
         if(index != 0){
             //If the current index is not the first index (0) of the password, call this function again and manipulate the character on the index one lower
-            pwdCheckerClient::createPwdRec(password, index-1, chars, counterOfTrials, passwordHacked);
+            pwdCheckerClient::createPwdRec(password, index-1, chars, counterOfTrials, passwordHacked, ptrClient);
 
             //If the password was hacked in the function call before, end the recusive function calls of guessing the password.
             if(passwordHacked==true){
@@ -142,13 +149,17 @@ void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int&
             //If the current index is the first index, the current password is one of the passwords which should be sended to the server. Increase the counter of Trial with 1.
             counterOfTrials++;
 
-            //client.sendData(pwdMsg::newMsg("CheckPassword", password));
-                        cout << "Sent message to server:\t" << pwdMsg::newMsg("CheckPassword", password) << endl << endl;
+            ptrClient->sendData(pwdMsg::newMsg("CheckPassword", password));
+
+            cout << "Sent message to server:\t" << pwdMsg::newMsg("CheckPassword", password) << endl << endl;
 
             //Receive an answer of the server.
-            //pwdMsg recmsg(client.receive(MESSAGE_SIZE));
+            pwdMsg recmsg(ptrClient->receive(MESSAGE_SIZE));
+
+            cout << "Answer from Server:\t" << recmsg.newMsg(recmsg.id_, recmsg.arg1_, recmsg.arg2_, recmsg.arg3_, recmsg.arg4_) << endl << endl;
 
                         //Simulation of Server answer.
+                        /*
                         pwdMsg recmsg;
                         int coincidence = rand()%25;
                         if(coincidence == 1){
@@ -158,7 +169,7 @@ void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int&
                         } else{
                             recmsg.readMsg("Access(Denied)");
                             cout << "Simulated Answer:\tAccess(Denied)" << endl;
-                        }
+                        }*/
 
             if((recmsg.id_ == "Access") && (recmsg.arg1_ == "Allowed")){
                 //Set passwordHacked to true to stop previous recursive calls

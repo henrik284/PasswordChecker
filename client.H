@@ -27,7 +27,7 @@ public:
     *   \param counterOfTrials. reference to a variable wich counts the Trials of guessing the Password.
     *   \param passwordHacked. reference to a variable wich will be set to true if the password is guess. This stopps the password guessing process.
     */
-    void createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked);
+    void createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked, pwdCheckerClient* ptrClient);
 
 
 };
