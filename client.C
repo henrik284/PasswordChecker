@@ -1,10 +1,3 @@
-/*
- * client.C
- *
- *  Created on: 11.09.2019
- *      Author: aml
- */
-
 #include <string>
 #include <iostream>
 #include <unistd.h> //contains various constants
@@ -24,7 +17,7 @@ int main(){
     string host = "localhost";
     string msg = {};
 
-    //Connect with Server
+    //Connect with Server. Try 10 times before closing the process
     int connectionTrys = 0;
     while(1){
         if(client.conn(host,PORT)==true){
@@ -60,13 +53,13 @@ int main(){
     //Create Stream to .csv file
     ofstream resultsStream("Results/Results.csv");
     if(!resultsStream){
-        cout << "Output file could not be created" << endl;
+        cout << "Output file could not be created. Pleas create a \"Results\" folder before starting the client." << endl;
     } else{
         cout << "Output file created" << endl;
     }
-    sleep(2);
+    sleep(1);
 
-    resultsStream << "password length; available characters; trys" << endl;
+    resultsStream << "password length; available characters; trys; time" << endl;
 
     //Loop over every Number of available characters
     for(int charsAvailable = 1; charsAvailable <= maxCharAmount; charsAvailable++){
@@ -79,14 +72,10 @@ int main(){
 
                 //Send "Create-New-Password"-Command to the Server
                 client.sendData(pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)));
-
                 cout << "Sent message to server:\t" << pwdMsg::newMsg("NewPassword", to_string(pwdLenght), to_string(charsAvailable)) << endl;
-
 
                 //Wait for the server to confirm, that a new password was created
                 pwdMsg recmsg(client.receive(MESSAGE_SIZE));
-
-                //pwdMsg recmsg("ServerStatus(Password Created)");
                 cout << "Answer from Server:\t" << recmsg.newMsg(recmsg.id_, recmsg.arg1_, recmsg.arg2_, recmsg.arg3_, recmsg.arg4_) << endl << endl;
 
                 //If Sever has created the password, end this loop.
@@ -109,13 +98,16 @@ int main(){
             //Variable which is set to true if the password is hacked.
             bool passwordHacked = false;
 
+            //Set Start time point.
+            time_t timebuffer = time(NULL);
+
             //Creating all possible Password with a call of the recursive createPwdRec function.
             client.createPwdRec(password, pwdLenght-1, charsAvailable, counterOfTrials, passwordHacked, &client);
 
             cout << endl << "Counter of Trials: " << counterOfTrials << "\tFinally hacked? " << passwordHacked << endl << endl << endl;
 
-            //Save pwdLength, charsAvailable & CounterOfTrials in .csv file
-            resultsStream << pwdLenght << ";" << charsAvailable << ";" << counterOfTrials << ";" << endl;
+            //Save pwdLength, charsAvailable, CounterOfTrials and used time in .csv file
+            resultsStream << pwdLenght << ";" << charsAvailable << ";" << counterOfTrials << ";" << (int)(time(NULL)-timebuffer) << endl;
 
         }
     }
@@ -150,15 +142,13 @@ void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int&
             counterOfTrials++;
 
             ptrClient->sendData(pwdMsg::newMsg("CheckPassword", password));
-
             cout << "Sent message to server:\t" << pwdMsg::newMsg("CheckPassword", password) << endl << endl;
 
             //Receive an answer of the server.
             pwdMsg recmsg(ptrClient->receive(MESSAGE_SIZE));
-
             cout << "Answer from Server:\t" << recmsg.newMsg(recmsg.id_, recmsg.arg1_, recmsg.arg2_, recmsg.arg3_, recmsg.arg4_) << endl << endl;
 
-                        //Simulation of Server answer.
+                        //Simulation of Server answer (for testing the client without the server)
                         /*
                         pwdMsg recmsg;
                         int coincidence = rand()%25;

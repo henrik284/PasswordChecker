@@ -1,9 +1,3 @@
-/*
- * server.C
- *
- *  Created on: 11.09.2019
- *      Author: aml
- */
 #include <cstdio> // standard input and output library
 #include <cstdlib> // this includes functions regarding memory allocation
 #include <cstring> // contains string functions

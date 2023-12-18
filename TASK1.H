@@ -91,6 +91,7 @@ protected:
 	/**
 	* \brief Creates a password of the length pwdLength with random characters out of the charSymbArray.
 	* \param pwdLength Length of the password, which will be created.
+	* \return Returns a random password
 	*/
 	string randomPwd(int pwdLength);
 
@@ -111,7 +112,6 @@ protected:
  *        password's checksum is stored.
  */
 class BlackBoxSafe : public BlackBoxUnsafe{
-	/// \todo  Implementation of class BlackBoxSafe needs to be finalized.
 public:
 	/**
 	*  \brief Constructor of BalckBoxSafe Class. Calls the BlackBoxUnsafe Constructor and directly overwrites the plan text password stored in the pwd_ member
@@ -156,12 +156,12 @@ void demoTASK1_02();
 class pwdMsg {
 public:
     /**
-    *   \brief constructor. Creates an object of this class and initializes the id and arguments with empty strings.
+    *   \brief constructor Creates an object of this class and initializes the id and arguments with empty strings.
     */
     pwdMsg();
 
     /**
-    *   \brief constructor. Creates an object and fills it with the information of an incoming message. The id and the arguments of the incoming message are getting stored in the members.
+    *   \brief Parameterized constructor Creates an object and fills it with the information of an incoming message. The id and the arguments of the incoming message are getting stored in the members.
     *   \param recMsg Received message
     */
     pwdMsg(string recMsg);
@@ -175,6 +175,7 @@ public:
     /**
     *   \brief Creates a Message out of the id and zero to four arguments.
     *           Static function: can be called without an object.
+    *   \return Returns the complete message as string.
     */
     static string newMsg(string id, string arg1 = "", string arg2 = "", string arg3 = "", string arg4 = "");
 
