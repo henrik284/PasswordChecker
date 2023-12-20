@@ -26,6 +26,7 @@ public:
     *   \param chars Number of available characters.
     *   \param counterOfTrials Reference to a variable wich counts the Trials of guessing the Password.
     *   \param passwordHacked Reference to a variable wich will be set to true if the password is guess. This stopps the password guessing process.
+    *   \param pwdCheckerClient* Pointer to the Client object. Is needed to run the send and receive methods.
     */
     void createPwdRec(string& password, int index, int chars, int& counterOfTrials, bool& passwordHacked, pwdCheckerClient* ptrClient);
 
