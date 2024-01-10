@@ -67,6 +67,6 @@ string pwdCheckerServer::myResponse(string input){
 
     }
     else {
-        cout << "ERROR: invalid message from client"
+        cout << "ERROR: invalid message from client";
     }
 }
