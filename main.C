@@ -17,13 +17,17 @@
 
 #include "SHA256.H"
 #include "TASK1.H"
+#include "SIMPLESOCKET.H"
 
 using namespace std;
 
 
 int main(){
-	srand(time(nullptr)); //hallo
-    TASK1::demoTASK1_02();
+	srand(time(nullptr));
+    TCPserver serv(2000,50);
+    TCPclient client;
+
+    cout << "The main.c is not used" << endl;
 
     return 0;
 }
