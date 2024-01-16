@@ -33,4 +33,5 @@ class pwdCheckerServer: public TCPserver{
     TASK1::BlackBoxSafe* ptrPwdBox_;
 };
 
+
 #endif // SERVER_H_INCLUDED

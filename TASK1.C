@@ -12,6 +12,7 @@
 #include "TASK1.H"
 #include "SHA256.H"
 
+
 namespace TASK1{
 
 //BlackboxUNSAFE

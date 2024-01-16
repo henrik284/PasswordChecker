@@ -33,6 +33,7 @@ int main(){
             }
         }
     }
+
     cout << "Connected to the Server" << endl << endl;
 
     //maxPwdLength & maxCharAmount abfragen
@@ -192,5 +193,3 @@ void pwdCheckerClient::createPwdRec(string& password, int index, int chars, int&
     }
     return;
 }
-
-
